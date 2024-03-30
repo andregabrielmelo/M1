@@ -8,8 +8,8 @@ using namespace std;
 struct Produto {
     string nome;
     float preco;
+    float desconto;
     int quantidade_disponivel;
-
 };
 
 // Struct node (prduto + próximo produto)
@@ -28,12 +28,17 @@ struct LUE {
 struct Carrinho {
     string vendedor;
     int valor_total;
-    LUE *lista = nullptr; // ?
+    LUE *lista = nullptr; // mudar?
 };
 
 // operator == overloading com o tipo Produto
 bool operator ==(const Produto &produto1, const Produto &produto2) {
     return (produto1.nome == produto2.nome && produto1.preco == produto2.preco && produto1.quantidade_disponivel == produto2.quantidade_disponivel);
+}
+
+// operator != overloading com o tipo Produto
+bool operator !=(const Produto &produto1, const Produto &produto2) {
+    return !(produto1.nome == produto2.nome && produto1.preco == produto2.preco && produto1.quantidade_disponivel == produto2.quantidade_disponivel);
 }
 
 // operator = overloading com o tipo Produto
@@ -47,15 +52,13 @@ Produto& Produto::operator=(const Produto& produto) {
     return *this;
 }
 
-bool inserir_final_lista(LUE *lista, Produto produto);// Inserir item na lista 
-// remover itens da lista (do estoque)
-
-
-bool pesquisar_lista(LUE *lista, Produto produto); // pesquisar lista
-
 int verificar_valor(LUE *lista, Produto produto); // verificar valores de itens na lista 
-// reajustar preço de item na lista
-// controlar quantidade disponiveis e discontos de cada item na lista 
+bool inserir_final_lista(LUE *lista, Produto produto);// Inserir item na lista 
+bool remover_lista(LUE *lista, Produto produto); // remover itens da lista (do estoque)
+bool pesquisar_lista(LUE *lista, Produto produto); // pesquisar lista
+bool reajustar_preco(LUE *lista, int posicao, float preco); // reajustar preço de item na lista
+bool reajustar_quantidade(LUE *lista, int posicao, int quantidade); // controlar quantidade disponiveis 
+bool reajustar_desconto(LUE *lista, int posicao, float desconto); // controlar descontos 
 // salvar lista em um arquivo
 // pegar lista de um arquivo
 
@@ -63,7 +66,7 @@ int main() {
     // Nova lista com os produtos a venda 
     LUE *produtos_venda = new LUE;
     if (produtos_venda == nullptr) {
-        printf("Alocação de memória falhou");
+        cout << "Alocação de memória falhou";
         return 1;
     }
 
@@ -129,3 +132,107 @@ bool inserir_final_lista(LUE *lista, Produto produto) { // Verificar novamente e
 
     return true;
 }
+
+bool remover_lista(LUE *lista, Produto produto) {
+    No *temp = lista->comeco; // nó temporario para atravessar a lista
+    No *temp_anterior = nullptr; // guarda o nó anterior do temp
+
+    // Enquanto o elemento da lista não for nulo
+    while (temp != nullptr && temp->produto != produto) {
+        temp_anterior = temp;
+        temp = temp->elo; // Próximo produto na lista 
+    }
+
+    if (temp == lista->comeco && temp == lista->fim) { // a lista contém um unico elemento
+        lista->comeco = nullptr;
+        lista->fim = nullptr;
+        delete temp;
+        return true;
+    }
+
+    if (temp == lista->comeco) { // se o elemento a ser excluido é o primeiro da lista
+        lista->comeco = temp->elo;
+        delete temp;
+        return true;
+    }
+
+    if (temp == lista->fim) { // se o elemento a ser excluido é o último da lista
+        temp_anterior->elo =  nullptr;
+        lista->fim = temp_anterior;
+        delete temp;
+        return true;
+    }
+
+    temp_anterior->elo = temp->elo; // caso o elemento a ser excluido esteja no meio da lista
+    delete temp;
+    return true;
+}
+
+bool reajustar_preco(LUE *lista, int posicao, float preco) {
+    if (lista == nullptr || lista->comeco == nullptr) { // verfica se a lista é valida
+        return false;
+    }
+
+    No *temp = lista->comeco; // nó temporario para atravessar a lista
+    int i = 0;
+
+    // Percorra a lista até a posição desejada
+    while (i != posicao) {
+        i++;
+        temp = temp->elo; // Próximo produto na lista 
+    }
+
+    if (temp == nullptr) { // Verifica se a posição é valida
+        return false;
+    }
+
+    temp->produto.preco = preco; // ajustando o preco
+
+    return true;
+}
+
+bool reajustar_quantidade(LUE *lista, int posicao, int quantidade) {
+    if (lista == nullptr || lista->comeco == nullptr) { // verfica se a lista é valida
+        return false;
+    }
+
+    No *temp = lista->comeco; // nó temporario para atravessar a lista
+    int i = 0;
+
+    // Percorra a lista até a posição desejada
+    while (i != posicao) {
+        i++;
+        temp = temp->elo; // Próximo produto na lista 
+    }
+
+    if (temp == nullptr) { // Verifica se a posição é valida
+        return false;
+    }
+
+    temp->produto.quantidade_disponivel = quantidade; // ajustando a quantidade 
+
+    return true;
+}
+
+bool reajustar_desconto(LUE *lista, int posicao, float desconto) { 
+    if (lista == nullptr || lista->comeco == nullptr) { // verfica se a lista é valida
+        return false;
+    }
+
+    No *temp = lista->comeco; // nó temporario para atravessar a lista
+    int i = 0;
+
+    // Percorra a lista até a posição desejada
+    while (i != posicao) {
+        i++;
+        temp = temp->elo; // Próximo produto na lista 
+    }
+
+    if (temp == nullptr) { // Verifica se a posição é valida
+        return false;
+    }
+
+    temp->produto.desconto = desconto; // ajustando o desconto
+
+    return true;
+} 
