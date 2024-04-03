@@ -53,6 +53,7 @@ Produto& Produto::operator=(const Produto& produto) {
 }
 
 int verificar_valor(LUE *lista, Produto produto); // verificar valores de itens na lista 
+bool imprimir_lista(LUE *lista); // mostrar lista
 bool inserir_final_lista(LUE *lista, Produto produto);// Inserir item na lista 
 bool remover_lista(LUE *lista, Produto produto); // remover itens da lista (do estoque)
 bool pesquisar_lista(LUE *lista, Produto produto); // pesquisar lista
@@ -62,6 +63,8 @@ bool reajustar_desconto(LUE *lista, int posicao, float desconto); // controlar d
 // salvar lista em um arquivo
 // pegar lista de um arquivo
 
+void decoracao(int numero);
+
 int main() {
     // Nova lista com os produtos a venda 
     LUE *produtos_venda = new LUE;
@@ -70,13 +73,74 @@ int main() {
         return 1;
     }
 
+    // Novo produto para vender
+    Produto blusa;
+    blusa.nome = "blusa";
+    blusa.preco = 30;
+    blusa.desconto = 0;
+    blusa.quantidade_disponivel = 1;
+
+    inserir_final_lista(produtos_venda, blusa);
+    imprimir_lista(produtos_venda);
+
     // Nova lista do cliente (carrinho de compras)
+    LUE *carrinho = new LUE;
+    if (carrinho == nullptr) {
+        cout << "Alocação de memória falhou";
+        return 1;
+    }
 
     // Nova lista com os dados sobre vendas (valor, desconto, forma de pagamento, 
     // total de vendas, total de vendas por forma de pagameto, total de vendar por vendedor, etc)
 
+    while(true) {
+        // Mostrar menu
+        cout << "\n" << decoracao << "\n";
+        cout << "\nEscolha uma das opções:";
+        cout << "\n1.Cliente Comprando";
+        cout << "\n2.Pesquisar";
+        cout << "\n3.Verificar Valor";
+        cout << "\n4.Reajustar Preço";
+        cout << "\n5.Remover Produto";
+        cout << "\n6.Inserir Produto";
+        cout << "\n7.Modificar Produto";
+        cout << "\n8.Exit";
+        cout << "\n" << decoracao << "\n";
+
+        char choice;
+        while(true) { // O usuário deve escolher o que fazer na aplicação 
+            cout << "\nRealizar a opção: ";
+            cin >> choice;
+
+            if (choice >= '1' && choice <= '8') { // Verifica a entrada do usuário
+                break;
+            } else {
+                cout << "\nEntrada inválida. Escolha uma número de 1 a 6.";
+            }
+        } 
+
+        switch (choice) {
+            case 1: // Cliente comprando
+                break;
+            
+            default:
+                break;
+        }
+
+    }
 
     return 0;
+}
+
+bool imprimir_lista(LUE *lista) {
+    No *temp = new No; // nó temporário para atravessar a lista 
+
+    // Equanto a lista não acabar
+    while (temp != nullptr) {
+        cout << temp->produto.nome << "," << temp->produto.preco << "," << temp->produto.desconto << "," << temp->produto.quantidade_disponivel << "\n";
+    }
+
+    return true;
 }
 
 bool pesquisar_lista(LUE *lista, Produto produto) { // Mudar para pesquisar o produto pelo nome/preço. Talvez deve retornar o produto?
@@ -236,3 +300,9 @@ bool reajustar_desconto(LUE *lista, int posicao, float desconto) {
 
     return true;
 } 
+
+void decoracao(int numero) {
+    for (int i = 0; i < numero; i++) { // = * numero
+        cout << "=";
+    }
+}
