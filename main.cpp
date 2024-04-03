@@ -2,6 +2,8 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+// Hello world
+
 using namespace std;
 
 // Struct produto 
