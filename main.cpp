@@ -94,6 +94,7 @@ int main() {
     // total de vendas, total de vendas por forma de pagameto, total de vendar por vendedor, etc)
 
     while(true) {
+
         // Mostrar menu
         cout << "\n" << decoracao << "\n";
         cout << "\nEscolha uma das opções:";
@@ -122,7 +123,22 @@ int main() {
         switch (choice) {
             case 1: // Cliente comprando
                 break;
-            
+            case 2: // Pesquisar um produto 
+                break;
+            case 3: // Verificar valor de um produto
+                break;
+            case 4: // Reajustar preço de um produto 
+                break;
+            case 5: // Remover produto
+                break;
+            case 6: // Inserir produto
+                break;
+            case 7: // Modificar produto
+                break;
+            case 8: // Sair do programa
+                cout << "\nSaindo do programa...";
+                // exclue os ponteiros? verificar se eles estão excluidos?
+                break;
             default:
                 break;
         }
