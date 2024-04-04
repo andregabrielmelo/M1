@@ -1,12 +1,11 @@
 #include <iostream>
 #include <stdlib.h>
 #include <stdio.h>
+#include <limits>
 #include <locale.h>
 
 using namespace std;
 
-
-//teste// 
 // Struct produto 
 struct Produto {
     string nome;
@@ -27,7 +26,8 @@ struct Produto {
     }
 };
 
-// Struct node (prduto + próximo produto)
+
+// Struct node (produto + próximo produto)
 struct No {
     Produto produto;
     No *elo = nullptr;
@@ -45,6 +45,16 @@ struct Carrinho {
     int valor_total;
     LUE *lista = nullptr; // mudar?
 };
+
+// operator << overloading 
+std::ostream& operator<<(std::ostream &os, const Produto &produto) {
+    os << "Nome: " << produto.nome << "\n";
+    os << "Preço: " << produto.preco << "\n";
+    os << "Desconto: " << produto.desconto << "%\n";
+    os << "Quantidade disponivel: " << produto.quantidade_disponivel << "\n";
+
+    return os;
+}
 
 // operator == overloading com o tipo Produto
 bool operator ==(const Produto &produto1, const Produto &produto2) {
@@ -66,6 +76,8 @@ bool reajustar_quantidade(LUE *lista, int posicao, int quantidade); // controlar
 bool reajustar_desconto(LUE *lista, int posicao, float desconto); // controlar descontos 
 // salvar lista em um arquivo
 // pegar lista de um arquivo
+
+bool mostrar_item_lista(LUE *lista, string nome_produto); // pesquisar e, se encontrar, mostrar o item
 
 void decoracao(int numero);
 
@@ -135,10 +147,29 @@ int main() {
             }
         } 
 
+        string nome_produto;
         switch (choice) {
             case 1: // Cliente comprando
                 break;
-            case 2: // Pesquisar um produto 
+            case '2': // Pesquisar um produto pelo nome 
+
+                // Qual item ele procura, o nome
+                cout << "\nQual o item que você procura?";
+                cout << "\nNome: ";
+                cin >> nome_produto;
+
+                // Procura e mostra o item
+                mostrar_item_lista(produtos_venda, nome_produto);
+
+                // Limpar buffer
+                cin.clear();
+                cin.ignore(numeric_limits<streamsize>::max(), '\n');
+
+                // Tem que pausar aqui
+                do {
+                cout << '\n' << "Press a key to continue...";
+                } while (cin.get() != '\n');
+
                 break;
             case 3: // Verificar valor de um produto
                 break;
@@ -343,4 +374,22 @@ void decoracao(int numero) {
     for (int i = 0; i < numero; i++) { // = * numero
         cout << "=";
     }
+}
+
+bool mostrar_item_lista(LUE *lista, string nome_produto) {
+    No *temp = lista->comeco; // no temporario para atravessar a lista
+
+    // Enquanto o elemento da lista não for nulo
+    bool tem = false;
+    while (temp != nullptr) {
+
+        if (temp->produto.nome == nome_produto) { // Se o produto foi encontrado na lista
+            cout << temp->produto; 
+            tem = true;
+        }
+
+        temp = temp->elo; // Próximo elemento na lista 
+    }
+
+    return tem;
 }
