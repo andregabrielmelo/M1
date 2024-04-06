@@ -33,6 +33,23 @@ bool inserir_final_lista(Lista *lista, Produto produto) {
     return true;
 }
 
+bool inserir_final_lista(Lista *lista, Produto *produto) {
+    ListaDuplamenteEncadeada *novo_produto = new ListaDuplamenteEncadeada;
+    if (novo_produto == nullptr) return false; // verificar alocação de memória
+    novo_produto->produto = *produto;
+
+    if (lista->comeco == nullptr) { // caso lista vazia
+        lista->comeco = novo_produto;
+    } else {
+        lista->fim->eloP = novo_produto;
+        novo_produto->eloA = lista->fim;
+    }
+
+    lista->fim = novo_produto;
+
+    return true;
+}
+
 void mostrarLista(Lista *lista) {
     ListaDuplamenteEncadeada *temp = new ListaDuplamenteEncadeada; // nó temporário para atravessar a lista
 
