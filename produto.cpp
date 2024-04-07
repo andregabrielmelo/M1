@@ -1,6 +1,7 @@
 #include <iostream>
 #include <stdlib.h>
 #include <stdio.h>
+#include <string>
 
 using namespace std;
 
@@ -24,22 +25,40 @@ ostream& operator<<(ostream &os, const Produto &produto) {
 
 // Funções
 // Criar produto
-Produto criar_produto() {
+Produto criarProduto() {
     Produto novo_produto; // cria a váriavel do novo produto 
 
     // Valores do novo produto
-    cout << "Nome: ";
-    cin >> novo_produto.nome;
+    std::cout << "Nome: ";
+    std::cin >> novo_produto.nome;
     
-    cout << "Preço: ";
-    cin >> novo_produto.preco;
+    std::cout << "Preço: ";
+    std::cin >> novo_produto.preco;
     
-    cout << "Desconto: ";
-    cin >> novo_produto.desconto;
+    std::cout << "Desconto: ";
+    std::cin >> novo_produto.desconto;
     
-    cout << "Quantidade: ";
-    cin >> novo_produto.quantidade;
+    std::cout << "Quantidade: ";
+    std::cin >> novo_produto.quantidade;
 
     return novo_produto; // retorno o novo produto 
 }
 
+// Funcao para reajustar produto //
+void reajustar(Produto *produto){
+
+    // Valores do reajuste
+    std::cout << "Novo nome: ";
+    std::cin >> produto->nome;
+
+    std::cout << "Novo preço: ";
+    std::cin >> produto->preco;
+
+    std::cout << "Novo desconto: ";
+    std::cin >> produto->desconto;
+
+    std::cout << "Nova quantidade: ";
+    std::cin >> produto->quantidade;
+
+    return;
+}
