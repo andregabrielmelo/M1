@@ -9,8 +9,9 @@
 #include "listaDuplamenteEncadeada.cpp"
 
 void pause();
+void limpar_tela();
 void limpar_buffer();
-void decoracao();
+void decoracao(int quantidade);
 
 int main() {
 
@@ -25,7 +26,7 @@ int main() {
     // // Nova lista
     // Lista *produtos_venda = new Lista;
     // if (produtos_venda == nullptr) {
-    //     cout << "\nAlocaÃ§Ã£o de memÃ³ria falhou";
+    //     cout << "\nAlocação de memÃ³ria falhou";
     //     return 1;
     // }
     // produtos_venda->comeco == nullptr;
@@ -40,31 +41,35 @@ int main() {
     Lista *catalogo = new Lista;
 
     while(true) {
+        limpar_tela(); // Sempre limpar tela antes de carregar o menu
 
         // Mostrar menu
-        decoracao();
+        cout << "\n";
+        decoracao(150);
         cout << "\n1.Inserir produto no catalogo";
         cout << "\n2.Mostrar catalogo";
-        cout << "\n3.Sair";
+        cout << "\n3.Pesquisar produto";
+        cout << "\n4.Sair";
         cout << "\n";
-        decoracao();
+        decoracao(150);
 
-        // Escolher opÃ§Ã£o
-        int choice;
+        // Escolher opção
+        int escolha;
         while(true) {
-            cout << "\nEscolher opÃ§Ã£o: ";   
-            cin >> choice;
+            cout << "\nEscolher opção: ";   
+            cin >> escolha;
 
-            if (1 <= choice && choice <= 3) {
+            if (1 <= escolha && escolha <= 4) {
                 break;
             } else {
                 cout << "\nEntrada invalida. Escolha um nÃºmero entre 1 e 3.";
             }
         }
 
-        // Ir para opÃ§Ã£o
-        switch (choice) {
+        // Ir para opção
+        switch (escolha) {
         case 1:  // Inseri um produto no catalogo
+        {
             Produto *novo_produto = new Produto; // Criar um ponteiro para o novo produto
 
             // Nome do produto
@@ -92,19 +97,88 @@ int main() {
             pause();
 
             break;
-
+        }
         case 2: // Mostra os produtos no catalogo
+        {
             mostrarLista(catalogo);
-            break;
 
-        case 3: // Sai do programa
-            cout << "\nObrigado por usar nosso programa\n";
-            return 0;
+            limpar_buffer();
+            pause();
+
+            break;
+        }
+        case 3: // Pesquisar produto
+        {
         
+        if (catalogo->comeco == nullptr) { // Verificar se a lista está vazia
+            cout << "\nCatalogo vazio!";
+            break;
+        }
+
+        // Pesquisar por nome ou preço
+        int *choice = new int;
+        cout << "\nPesquisar por:";
+        cout << "\n1.Nome";
+        cout << "\n2.Preço";
+
+        while(true) {
+            cout << "\nEscolher opção: ";   
+            cin >> *choice;
+
+            if (1 <= *choice && *choice <= 2) {
+                break;
+            } else {
+                cout << "\nEntrada invalida. Escolha um nÃºmero entre 1 e 2.";
+            }
+        }
+
+        if (*choice == 1) {
+            string *nome = new string; // cria váriael para guardar nome do produto
+            
+            // Pega o nome do produto procurado
+            cout << "\nNome do produto: "; 
+            cin >> *nome; // TODO: validar input 
+
+            // Mostra o produto encontrado
+            cout << pesquisarProduto(catalogo, *nome);
+
+            delete nome; // libera o ponteiro 
+        } else {
+            float *preco = new float; // cria variável para guardar o preco do produto
+
+            // Pega o preco do produto procurado
+            cout << "\nPreço do produto: ";
+            cin >> *preco; // TODO: validar input 
+
+            // Mostra o produto encontrado
+            cout << pesquisarProduto(catalogo, *preco);
+
+            delete preco; // libera o ponteiro
+        }
+        
+        delete choice; // libera o ponteiro
+
+        pause();
+
+        break;
+        }
+        case 4: // Sai do programa
+        {
+            cout << "\nObrigado por usar nosso programa\n";
+
+            // Colocar a lista emn outro arquivo
+            // Liberar lista 
+
+            return 0;
+        }
         default:
             break;
         }
     } 
+}
+
+void limpar_tela() {
+    cout << "\033[2J\033[1;1H";
 }
 
 void limpar_buffer() { // Limpa o buffer
@@ -120,10 +194,12 @@ void pause() {
     return;
 }
 
-void decorcao() { 
-    for (int i = 0; i < numeric_limits<streamsize>::max(); i++) { // Printa uma linha inteira de '='
+void decoracao(int quantidade) { 
+    for (int i = 0; i < quantidade; i++) { // Printa '=' * quantidade 
         cout << "=";
     }
 
     return;
 }
+
+// TODO: Fazer função para validar o input do usuário 
