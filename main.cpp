@@ -1,3 +1,6 @@
+//            Trabalho M1 - Estrurura de dados           // 
+// Nomes: Thomas Norfleet Crews & Andre Gabriel De Melo //
+
 #include <iostream>
 #include <stdlib.h>
 #include <stdio.h>
@@ -14,10 +17,22 @@ using namespace std;
 
 const int TAMANHO_MAXIMO = 100; // Tamanho máximo do array
 
-
 struct Carrinho {
     string vendedor;
-    Lista lista_compras;
+    Lista *lista_compras = new Lista;
+};
+
+struct Venda {
+    float valorTotal;
+    float desconto;
+    string formaPagamento;
+    string vendedor;
+    Venda *proxima_venda = nullptr;
+};
+
+struct ListaVenda {
+    Venda *comeco = nullptr;
+    Venda *fim = nullptr;
 };
 
 // TODO: Fazer função para validar o input do usuário 
@@ -30,6 +45,11 @@ void decoracao(int quantidade);
 bool lerArquivo(Lista *lista, string arquivo_nome);
 bool salvarDados(Lista *lista, string arquivo_nome);
 
+void mostrarCarrinho(Carrinho carrinho);
+bool inserirVenda(ListaVenda *lista, Venda venda);
+Venda registrarVenda(Carrinho carrinho, string formaPagamento);
+void mostrarVenda(ListaVenda *lista);
+
 int main() {
 
     setlocale(LC_ALL, "Portuguese_Brazil");
@@ -37,20 +57,21 @@ int main() {
     Lista *catalogo = new Lista;
     lerArquivo(catalogo, "catalogo.csv");
 
+    ListaVenda *vendas = new ListaVenda;
+    
     while(true) {
         limpar_tela(); // Sempre limpar tela antes de carregar o menu
 
         // Mostrar menu
-        cout << "\n";
         decoracao(150);
         cout << "\n1.Inserir produto no catalogo";
         cout << "\n2.Remover produto do catalago";
         cout << "\n3.Reajustar produto do catalago";
         cout << "\n4.Mostrar catalogo";
         cout << "\n5.Pesquisar produto";
-        cout << "\n6.Adicionar ao Carrinho";
-        cout << "\n7.Remover ao Carrinho";
-        cout << "\n7.Sair";
+        cout << "\n6.Comprar";
+        cout << "\n7.Total Vendas";
+        cout << "\n8.Sair";
         cout << "\n";
         decoracao(150);
 
@@ -60,10 +81,10 @@ int main() {
             cout << "\nEscolher opção: ";   
             cin >> escolha;
 
-            if (1 <= escolha && escolha <= 7) {
+            if (1 <= escolha && escolha <= 8) {
                 break;
             } else {
-                cout << "\nEntrada invalida. Escolha um número entre 1 e 6.";
+                cout << "\nEntrada invalida. Escolha um número entre 1 e 7.";
             }
         }
 
@@ -121,21 +142,20 @@ int main() {
         }
         case 3: // Reajusta produto do catalogo
         {
-            // string nome;
-            // cout << "\nEscolha algum produto do catalogo: ";
-            // cin >> nome;
+            string nome;
+            cout << "\nEscolha algum produto do catalogo: ";
+            cin >> nome;
 
-            // cout << "hello";
-            // Produto *temp = new Produto;
-            // temp = &pesquisarProduto(catalogo, nome);
-            // cout << "hello";
-            // if (temp == nullptr) {
-            //     cout << "\nProduto não encontrado\n";
-            //     pause();
-            //     break;
-            // }
-        
-            // reajustar(temp);
+            Produto *temp = new Produto;
+            temp = pegarEndereco(catalogo, nome);
+            
+            if (temp == nullptr) {
+                cout << "\nProduto não encontrado\n";
+                pause();
+                break;
+            }
+    
+            reajustar(temp);
             break;
         }
         case 4: // Mostra os produtos no catalogo
@@ -153,67 +173,217 @@ int main() {
         case 5: // Pesquisar produto
         {
         
-        if (catalogo->comeco == nullptr) { // Verificar se a lista está vazia
-            cout << "\nCatalogo vazio!";
+            if (catalogo->comeco == nullptr) { // Verificar se a lista está vazia
+                cout << "\nCatalogo vazio!";
+                pause();
+                break;
+            }
+
+            // Pesquisar por nome ou preço
+            int *choice = new int;
+            cout << "\nPesquisar por:";
+            cout << "\n1.Nome";
+            cout << "\n2.Preço";
+
+            while(true) {
+                cout << "\nEscolher opção: ";   
+                cin >> *choice;
+
+                if (1 <= *choice && *choice <= 2) {
+                    break;
+                } else {
+                    cout << "\nEntrada invalida. Escolha um número entre 1 e 2.";
+                }
+            }
+
+            if (*choice == 1) {
+                string *nome = new string; // cria váriael para guardar nome do produto
+                
+                // Pega o nome do produto procurado
+                cout << "\nNome do produto: ";
+                limpar_buffer(); 
+                cin >> *nome; // TODO: validar input 
+
+                // Mostra o produto encontrado
+                cout << pesquisarProduto(catalogo, *nome);
+
+                delete nome; // libera o ponteiro 
+            } else {
+                float *preco = new float; // cria variável para guardar o preco do produto
+
+                // Pega o preco do produto procurado
+                cout << "\nPreço do produto: ";
+                cin >> *preco; // TODO: validar input 
+
+                // Mostra o produto encontrado
+                cout << pesquisarProduto(catalogo, *preco);
+
+                delete preco; // libera o ponteiro
+            }
+            
+            delete choice; // libera o ponteiro
+
             pause();
+
             break;
         }
-
-        // Pesquisar por nome ou preço
-        int *choice = new int;
-        cout << "\nPesquisar por:";
-        cout << "\n1.Nome";
-        cout << "\n2.Preço";
-
-        while(true) {
-            cout << "\nEscolher opção: ";   
-            cin >> *choice;
-
-            if (1 <= *choice && *choice <= 2) {
-                break;
-            } else {
-                cout << "\nEntrada invalida. Escolha um número entre 1 e 2.";
-            }
-        }
-
-        if (*choice == 1) {
-            string *nome = new string; // cria váriael para guardar nome do produto
+        case 6:
+        {
             
-            // Pega o nome do produto procurado
-            cout << "\nNome do produto: ";
-            limpar_buffer(); 
-            cin >> *nome; // TODO: validar input 
+            // criar carrinho
+            Carrinho carrinho;
+            carrinho.lista_compras = new Lista;
 
-            // Mostra o produto encontrado
-            cout << pesquisarProduto(catalogo, *nome);
+            bool comprando = true;
 
-            delete nome; // libera o ponteiro 
-        } else {
-            float *preco = new float; // cria variável para guardar o preco do produto
+            limpar_tela();
+            
+            // Pega o vendedor
+            cout << "\nNome do vendedor: ";
+            cin >> carrinho.vendedor;
 
-            // Pega o preco do produto procurado
-            cout << "\nPreço do produto: ";
-            cin >> *preco; // TODO: validar input 
+            while (comprando) {
+                limpar_tela();
 
-            // Mostra o produto encontrado
-            cout << pesquisarProduto(catalogo, *preco);
+                cout << "\nComprando\n";
 
-            delete preco; // libera o ponteiro
+                // Opções
+                cout << "\n1.Adicionar ao carrinho";
+                cout << "\n2.Retirar do carrinho";
+                cout << "\n3.Mostrar carrinho";
+                cout << "\n4.Ir ao caixa";
+
+                // Escolher opção
+                int escolhaComprando;
+                while(true) {
+                    cout << "\n\nEscolher opção: ";   
+                    cin >> escolhaComprando;
+
+                    if (1 <= escolhaComprando && escolhaComprando <= 4) {
+                        break;
+                    } else {
+                        cout << "\nEntrada invalida. escolha um número entre 1 e 4.";
+                    }
+                }
+
+                switch(escolhaComprando){
+                    case 1: // Adicionando produto no carrinho
+                    {
+                        limpar_tela();
+
+                        cout << "\nAdicionando ao carrinho...\n";
+
+                        // Escolhendo produto
+                        string nome_produto;
+                        cout << "\nNome do produto: ";
+                        cin >> nome_produto;
+
+                        // Pesquisando o produto
+                        Produto produto = pesquisarProduto(catalogo, nome_produto);
+
+                        // Verificar que o produto foi retornado 
+                        if (produto.nome == "") {
+                            cout << "\nProduto não encontrado!\n";
+                            
+                            pause();
+                            break;
+                        }
+
+                        // Inserindo o produto
+                        inserir_final_lista(carrinho.lista_compras, produto);
+
+                        pause();
+                        break;
+                    }
+                    case 2:
+                    {
+                        limpar_tela();
+
+                        cout << "\nRemovendo do carrinho...\n";
+
+                        // Escolhendo produto
+                        string nome_produto;
+                        cout << "\nNome do produto: ";
+                        cin >> nome_produto;
+
+                        // Pesquisando o produto
+                        Produto produto = pesquisarProduto(catalogo, nome_produto);
+
+                        // Verificar que o produto foi retornado 
+                        if (produto.nome == "") {
+                            cout << "\nProduto não encontrado!\n";
+                            
+                            pause();
+                            break;
+                        }
+
+                        // Remover produto
+                        liberarItemLista(carrinho.lista_compras, produto.nome);
+
+                        pause();
+                        break;
+
+                    }
+                    case 3:
+                    {
+                        limpar_tela();
+
+                        mostrarCarrinho(carrinho);
+
+                        pause();
+                        break;
+                    }
+                    case 4:
+                    {
+                        limpar_tela();
+
+                        cout << "\nFinalizando compra...\n";
+
+                        // Mostra o carrinho
+                        mostrarCarrinho(carrinho);
+
+                        // Pegar valor total
+                        
+                        // Pegar forma de pagamento
+                        string formaPagamento;
+
+                        cout << "\nPix";
+                        cout << "\nDinheiro";
+                        cout << "\nCartão";
+
+                        cout << "\n\nForma de pagamento: ";
+                        cin >> formaPagamento;
+
+                        // Registra venda 
+                        inserirVenda(vendas, registrarVenda(carrinho, formaPagamento));
+
+                        // Volta para o menu principal
+                        comprando = false;
+                        
+                        pause();
+                        break;
+                    }
+                    default:
+                    {
+                        break;
+                    }
+                }
+            }
+            break;
         }
-        
-        delete choice; // libera o ponteiro
-
-        pause();
-
-        break;
+        case 7: // Total Vendas Dia
+        {
+            mostrarVenda(vendas);
         }
-        case 6: // Sai do programa
+         case 8: // Sai do programa
         {
             cout << "\nObrigado por usar nosso programa\n";
 
             // Colocar a lista emn outro arquivo
             salvarDados(catalogo, "catalogo.csv");
-            // Liberar lista 
+
+            // Liberar lista
+        
 
             return 0;
         }
@@ -248,6 +418,7 @@ void decoracao(int quantidade) {
 
     return;
 }
+
 
 bool lerArquivo(Lista *lista, string arquivo_nome) {
     ifstream arquivo;
@@ -295,12 +466,6 @@ bool lerArquivo(Lista *lista, string arquivo_nome) {
     return true;
 }
 
-
-// Funcao para salvar arquivo das compras
-void arquivosCompras(Lista *lista, string arquivo_nome){
-    
-}
-
 // Função para salvar os dados em um arquivo
 bool salvarDados(Lista *lista, string arquivo_nome) {
     
@@ -343,11 +508,102 @@ void carregaraDados(int* array, int& tamanho, const string& arquivo_nome) {
     }
 }
 
+void mostrarCarrinho(Carrinho carrinho) {
+    if (carrinho.lista_compras == nullptr) { // verificar se o carrinho está vazio
+        cout << "\nCarrinho vazio!\n";
+        return;
+    }
 
+    // Mostrar vendedor
+    cout << "\nVendedor: " << carrinho.vendedor;
 
-// * listas permanentes
-// 1 - [lista comprador] (armazenar compras) 
-// 1.1 - na lista do comprador precisa falar quem atendeu o cliente
-// 2 - [lista caixa] 
-// 2.1 - valor total compras, descontos, valor pago pelo cliente, forma pagamento, *se necesario mostrar troco a ser dado ao cliente*
-// 3 -[vendas do dia] - criar outra lista para salvar as informacoes do (total de vendas), (total de vendas por forma de pagamento),(vendas por vendedor)
+    ItemDuplamenteEncadeada *temp = new ItemDuplamenteEncadeada; // Novo item para atravessar a lista do carrinho
+
+    temp = carrinho.lista_compras->comeco; // temp aponta para o inicio da lista
+
+    // Mostrar compras
+    cout << "\nCompras:\n";
+
+    while (temp != nullptr) {
+        // Mostra o item
+        cout << temp->produto.nome;
+        cout << "\nPreço sem desconto: " << temp->produto.preco;
+        cout << "\nPreço com desconto: " << (temp->produto.preco * (1 - temp->produto.desconto)) << "(" << temp->produto.desconto << "%)";
+        cout << "\nQuantidade disponivel: " << temp->produto.quantidade;
+
+        temp = temp->eloP; // temp vai para o próximo item
+    }
+
+    cout << "Total: ";
+
+}
+
+bool inserirVenda(ListaVenda *lista, Venda venda){
+    // Criar um novo nó para armazenar a nova venda
+    Venda *nova_venda = new Venda;
+    *nova_venda = venda; // Copiar os dados da venda para a nova venda
+
+    // Se a lista estiver vazia
+    if (lista->comeco == nullptr) {
+        lista->comeco = nova_venda;
+        lista->fim = nova_venda;
+        return true;
+    }
+
+    // Adicionar venda no final
+    lista->fim->proxima_venda = nova_venda;
+    lista->fim = nova_venda;
+
+    return true;
+}
+
+Venda registrarVenda(Carrinho carrinho, string formaPagamento) {
+    // Criar variavel para atravessar lista
+    ItemDuplamenteEncadeada *temp = new ItemDuplamenteEncadeada;
+
+    // Aponta para o começo da lista
+    temp = carrinho.lista_compras->comeco;
+    
+    // Pegar valor total
+    float valorTotal = 0;
+    float descontoTotal = 0;
+    while (temp != nullptr) {
+        valorTotal += (temp->produto.preco * (1 - temp->produto.desconto));
+        descontoTotal += (temp->produto.preco * temp->produto.desconto);
+
+        temp = temp->eloP; // Vai para o próximo elemento
+    }
+
+    // Cria um novo objeto Venda
+    Venda nova_venda;
+    nova_venda.valorTotal = valorTotal;
+    nova_venda.desconto = descontoTotal;
+    nova_venda.formaPagamento = formaPagamento;
+    nova_venda.vendedor = carrinho.vendedor;
+
+    // Insere a venda na lista de vendas
+    return nova_venda;
+}
+
+void mostrarVenda(ListaVenda *lista) {
+    Venda *temp = new Venda; // nó temporário para atravessar a lista
+
+    if (lista->comeco == nullptr) { // Se a lista estiver vazia
+        cout << "\nLista vazia"; // TODO: Retirar isso e retornar algo ao inves disso?
+    }
+
+    temp = lista->comeco; // Aponta para o começo da lista
+
+    // Equanto a lista não acabar
+    while (temp != nullptr) {
+        cout << "\n";
+        cout << temp->valorTotal;
+        cout << temp->desconto;
+        cout << temp->formaPagamento;
+        cout << temp->vendedor;
+
+        cout << "\n";
+
+        temp = temp->proxima_venda; // próximo elemento
+    }
+}
